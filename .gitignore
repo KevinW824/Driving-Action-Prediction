@@ -3,5 +3,10 @@
 .idea/Driving-Action-Prediction.iml
 .idea/misc.xml
 .idea/modules.xml
+<<<<<<< HEAD
 .idea/vcs.xml
 .idea/workspace.xml
+=======
+.idea/workspace.xml
+.idea/vcs.xml
+>>>>>>> Gray-Scale
