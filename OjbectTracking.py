@@ -35,7 +35,15 @@ gimg = gray_scale(img_thresh)
 timg = binary_threshold(gimg)
 
 lst_row = timg[234:235,:]
-# lst_row.tolist().index(255)
+
+index = []
+for i in range(len(lst_row[0])):
+    if lst_row[0][i] == 255:
+        index.append(i)
+print(index)
+
+midpoint_left = (min(index) + max(index)) * 0.5
+print(midpoint_left)
 
 
 # col = np.sum(thresh, axis=0)
@@ -47,7 +55,6 @@ lst_row = timg[234:235,:]
 # ret,thresh = cv2.threshold(Gimg,175,255,cv2.THRESH_BINARY)
 cv2.imshow('frame0_thresh', timg)
 cv2.imshow('lst_raw',lst_row)
-
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
