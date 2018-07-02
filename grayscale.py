@@ -1,120 +1,121 @@
-import cv2
-import numpy as np
-import glob
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import time
-import os
-import os.path
-from pathlib import Path
-
-
-# def calc_line_fits_from_prevcalc_line(img, leftLine, rightLine):
-#
-#     left_fit = leftLine.best_fit_px
-#     right_fit = rightLine.best_fit_px
-#
-#     ### Settings
-#     margin = 100  # Width on either side of the fitted line to search
-#
-#     nonzero = img.nonzero()
-#     nonzeroy = np.array(nonzero[0])
-#     nonzerox = np.array(nonzero[1])
-#
-#     left_lane_inds = ((nonzerox > (left_fit[0] * (nonzeroy ** 2) + left_fit[1] * nonzeroy + left_fit[2] - margin)) & (
-#     nonzerox < (left_fit[0] * (nonzeroy ** 2) + left_fit[1] * nonzeroy + left_fit[2] + margin)))
-#     right_lane_inds = ((nonzerox > (right_fit[0] * (nonzeroy ** 2) + right_fit[1] * nonzeroy + right_fit[2] - margin)) & (
-#     nonzerox < (right_fit[0] * (nonzeroy ** 2) + right_fit[1] * nonzeroy + right_fit[2] + margin)))
-#
-#     # Extract left and right line pixel positions
-#     leftx = nonzerox[left_lane_inds]
-#     lefty = nonzeroy[left_lane_inds]
-#     rightx = nonzerox[right_lane_inds]
-#     righty = nonzeroy[right_lane_inds]
-#
-#     # Fit a second order polynomial to each
-#     left_fit = np.polyfit(lefty, leftx, 2)
-#     right_fit = np.polyfit(righty, rightx, 2)
-#
-#     # Fit a second order polynomial to each in meters
-#     left_fit_m = np.polyfit(lefty * ym_per_pix, leftx * xm_per_pix, 2)
-#     right_fit_m = np.polyfit(righty * ym_per_pix, rightx * xm_per_pix, 2)
-#
-#     # Generate x and y values for plotting
-#     ploty = np.linspace(0, binary_warped.shape[0] - 1, binary_warped.shape[0])
-#     left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
-#     right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
-#
-#     # Create an image to draw on and an image to show the selection window
-#     out_img = np.dstack((binary_warped, binary_warped, binary_warped)) * 255
-#     window_img = np.zeros_like(out_img)
-#
-#     # Color in left and right line pixels
-#     out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
-#     out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
-#
-#     # Generate a polygon to illustrate the search window area
-#     # And recast the x and y points into usable format for cv2.fillPoly()
-#     left_line_window1 = np.array([np.transpose(np.vstack([left_fitx - margin, ploty]))])
-#     left_line_window2 = np.array([np.flipud(np.transpose(np.vstack([left_fitx + margin, ploty])))])
-#     left_line_pts = np.hstack((left_line_window1, left_line_window2))
-#     right_line_window1 = np.array([np.transpose(np.vstack([right_fitx - margin, ploty]))])
-#     right_line_window2 = np.array([np.flipud(np.transpose(np.vstack([right_fitx + margin, ploty])))])
-#     right_line_pts = np.hstack((right_line_window1, right_line_window2))
-#
-#     # Draw the lane onto the warped blank image
-#     cv2.fillPoly(window_img, np.int_([left_line_pts]), (0, 255, 0))
-#     cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 255, 0))
-#     result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
-#
-#     return left_fit, right_fit, left_fit_m, right_fit_m, result
-
-# Create folder to save frames
-try:
-    if not os.path.exists('data'):
-        os.makedirs('data')
-except OSError:
-    print ('Error: Creating directory of data')
-
-# Initialize webcam
-cap = cv2.VideoCapture('project_video.mp4')
-
-currentFrame = 0
-
-while cap.isOpened():
-    my_file = Path('./data/frame' + str(currentFrame) + '.jpg')
-
-    # time.sleep(0.3)
-    # Read webcam image
-    ret, frame = cap.read()
-
-    # Convert image from RBG/BGR to GRAYSCALE
-    gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Binary Thresholding
-    # Set Threshold to 190-255
-    # Everything out of the range will be displayed black
-    ret,thresh = cv2.threshold(gray_img,175,255,cv2.THRESH_BINARY)
-
-
-    # Display result
-    cv2.imshow('Original', frame)
-    cv2.imshow('grayimage', gray_img)
-    cv2.imshow('thresh', thresh)
-
-    # Save each frames
-    name = './data/frame' + str(currentFrame) + '.jpg'
-    print('Creating...' + name)
-    cv2.imwrite(name, gray_img)
-
-    currentFrame += 1
-
-
-
-    if cv2.waitKey(1) == 13:
-        break
-
-
-
-cap.release()
-cv2.destroyAllWindows()
+def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
+    """
+    NOTE: this is the function you might want to use as a starting point once you want to 
+    average/extrapolate the line segments you detect to map out the full
+    extent of the lane (going from the result shown in raw-lines-example.mp4
+    to that shown in P1_example.mp4).  
+    
+    Think about things like separating line segments by their 
+    slope ((y2-y1)/(x2-x1)) to decide which segments are part of the left
+    line vs. the right line.  Then, you can average the position of each of 
+    the lines and extrapolate to the top and bottom of the lane.
+    
+    This function draws `lines` with `color` and `thickness`.   
+    Lines are drawn on the image inplace (mutates the image).
+    If you want to make the lines semi-transparent, think about combining
+    this function with the weighted_img() function below
+    """
+    # In case of error, don't draw the line(s)
+    if lines is None:
+        return
+    if len(lines) == 0:
+        return
+    draw_right = True
+    draw_left = True
+    
+    # Find slopes of all lines
+    # But only care about lines where abs(slope) > slope_threshold
+    slope_threshold = 0.5
+    slopes = []
+    new_lines = []
+    for line in lines:
+        x1, y1, x2, y2 = line[0]  # line = [[x1, y1, x2, y2]]
+        
+        # Calculate slope
+        if x2 - x1 == 0.:  # corner case, avoiding division by 0
+            slope = 999.  # practically infinite slope
+        else:
+            slope = (y2 - y1) / (x2 - x1)
+            
+        # Filter lines based on slope
+        if abs(slope) > slope_threshold:
+            slopes.append(slope)
+            new_lines.append(line)
+        
+    lines = new_lines
+    
+    # Split lines into right_lines and left_lines, representing the right and left lane lines
+    # Right/left lane lines must have positive/negative slope, and be on the right/left half of the image
+    right_lines = []
+    left_lines = []
+    for i, line in enumerate(lines):
+        x1, y1, x2, y2 = line[0]
+        img_x_center = frame.shape[1] / 2  # x coordinate of center of image
+        if slopes[i] > 0 and x1 > img_x_center and x2 > img_x_center:
+            right_lines.append(line)
+        elif slopes[i] < 0 and x1 < img_x_center and x2 < img_x_center:
+            left_lines.append(line)
+            
+    # Run linear regression to find best fit line for right and left lane lines
+    # Right lane lines
+    right_lines_x = []
+    right_lines_y = []
+    
+    for line in right_lines:
+        x1, y1, x2, y2 = line[0]
+        
+        right_lines_x.append(x1)
+        right_lines_x.append(x2)
+        
+        right_lines_y.append(y1)
+        right_lines_y.append(y2)
+        
+    if len(right_lines_x) > 0:
+        right_m, right_b = np.polyfit(right_lines_x, right_lines_y, 1)  # y = m*x + b
+    else:
+        right_m, right_b = 1, 1
+        draw_right = False
+        
+    # Left lane lines
+    left_lines_x = []
+    left_lines_y = []
+    
+    for line in left_lines:
+        x1, y1, x2, y2 = line[0]
+        
+        left_lines_x.append(x1)
+        left_lines_x.append(x2)
+        
+        left_lines_y.append(y1)
+        left_lines_y.append(y2)
+        
+    if len(left_lines_x) > 0:
+        left_m, left_b = np.polyfit(left_lines_x, left_lines_y, 1)  # y = m*x + b
+    else:
+        left_m, left_b = 1, 1
+        draw_left = False
+    
+    # Find 2 end points for right and left lines, used for drawing the line
+    # y = m*x + b --> x = (y - b)/m
+    y1 = frame.shape[0]
+    y2 = frame.shape[0] * (1 - trap_height)
+    
+    right_x1 = (y1 - right_b) / right_m
+    right_x2 = (y2 - right_b) / right_m
+    
+    left_x1 = (y1 - left_b) / left_m
+    left_x2 = (y2 - left_b) / left_m
+    
+    # Convert calculated end points from float to int
+    y1 = int(y1)
+    y2 = int(y2)
+    right_x1 = int(right_x1)
+    right_x2 = int(right_x2)
+    left_x1 = int(left_x1)
+    left_x2 = int(left_x2)
+    
+    # Draw the right and left lines on image
+    if draw_right:
+        cv2.line(frame, (right_x1, y1), (right_x2, y2), color, thickness)
+    if draw_left:
+        cv2.line(frame, (left_x1, y1), (left_x2, y2), color, thickness)
