@@ -32,7 +32,7 @@ while cap.isOpened():
 	blur = cv2.GaussianBlur(gray, (5,5), 0)
 
 	#Threshold
-	ret,bt = cv2.threshold(blur,190,255,cv2.THRESH_BINARY)
+	ret,bt = cv2.threshold(blur,165,255,cv2.THRESH_BINARY)
 
 	# finds edges in the input image image and
 	# marks them in the output map edges
@@ -43,7 +43,7 @@ while cap.isOpened():
 
 	# defining a four sided polygon to mask
 	imshape = frame.shape
-	vertices = np.array([[(235,imshape[0]),(555, 440), (680, 440), (1200,imshape[0])]], dtype=np.int32)
+	vertices = np.array([[(235,imshape[0]),(555, 440), (752, 440), (1270,558), (imshape[1],imshape[0])]], dtype=np.int32)
 	poly = cv2.fillPoly(mask, vertices, ignore_mask_color)
 	masked_edges = cv2.bitwise_and(edges, mask)
 
@@ -154,9 +154,9 @@ while cap.isOpened():
 	
 	# Draw the right and left lines on image
 	if draw_right:
-		cv2.line(frame, (right_x1, y1), (right_x2, y2), (0,255,0), 5)
+		right = cv2.line(frame, (right_x1, y1), (right_x2, y2), (0,255,0), 3)
 	if draw_left:
-		cv2.line(frame, (left_x1, y1), (left_x2, y2), (0,255,0), 5)
+		left = cv2.line(frame, (left_x1, y1), (left_x2, y2), (0,255,0), 3)
 
 
 	cv2.imshow('line', frame)
