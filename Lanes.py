@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 
-cap = cv2.VideoCapture('project_video.mp4')
+cap = cv2.VideoCapture('black_car.mp4')
 
 draw_right = True
 draw_left = True
