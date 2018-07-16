@@ -728,18 +728,4 @@ clip1 = VideoFileClip("project_video.mp4")
 white_clip = clip1.fl_image(full_pipeline)
 start_time = time.time() 
 white_clip.write_videofile(white_output, audio=False)
-print ("--- %s seconds used ---" % (time.time() - start_time))
-
-# Extract frame from video if necessary
-# Import the necessary packages
-# import argparse
-# import cv2
-
-# vidcap = cv2.VideoCapture("challenge4.mp4")
-# success,image = vidcap.read()
-# count = 0;
-# while count < 10:
-#     success,image = vidcap.read()
-#     if count == 7:
-#         cv2.imwrite("frame%d.jpg" % count, image)     # save frame as JPEG file
-#     count += 1
+print ("--- %1f seconds used ---" % (time.time() - start_time))
